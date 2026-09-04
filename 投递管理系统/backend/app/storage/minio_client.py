@@ -26,21 +26,32 @@ def get_client() -> Minio:
     return _client
 
 
+def _split_endpoint(endpoint: str) -> tuple[str, bool]:
+    """拆出 (host[:port], 是否 ssl)。支持 http:// / https:// 前缀；无前缀沿用 minio_use_ssl。"""
+    if endpoint.startswith("https://"):
+        return endpoint[len("https://"):], True
+    if endpoint.startswith("http://"):
+        return endpoint[len("http://"):], False
+    return endpoint, settings.minio_use_ssl
+
+
 def get_presign_client() -> Minio:
     """生成预签名 URL 用的客户端。
 
-    服务器部署时 minio_endpoint 指向容器内网地址（如 minio:9000），
+    服务器部署时 minio_endpoint 指向容器内网地址（如 host.docker.internal:9000），
     浏览器拿到的 URL 必须是可达的外网地址，故预签名单独用外部端点。
+    外部端点支持 https:// 前缀（走域名 HTTPS 时必须）。
     未配置外部端点时与内部端点一致（本地开发场景，行为不变）。
     """
     external = settings.minio_external_endpoint or settings.minio_endpoint
     if external == settings.minio_endpoint:
         return get_client()
+    host, secure = _split_endpoint(external)
     return Minio(
-        external,
+        host,
         access_key=settings.minio_root_user,
         secret_key=settings.minio_root_password,
-        secure=settings.minio_use_ssl,
+        secure=secure,
     )
 
 
