@@ -1,7 +1,7 @@
 import { client, unwrap } from './client'
 import type { Resume } from '@/types'
 
-export const getResumes = () => unwrap(client.get('/resumes'))
+export const getResumes = () => unwrap<Resume[]>(client.get('/resumes'))
 export const deleteResume = (id: number) =>
   unwrap<unknown>(client.delete(`/resumes/${id}`))
 

@@ -5,7 +5,7 @@ import * as echarts from 'echarts'
 import StatCard from '@/components/StatCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { getSummary, getTrend, getTodos, getRecentEvents } from '@/api/analytics'
-import type { AnalyticsSummary, RecentEventItem, TodoItem, TrendPoint } from '@/types'
+import type { AnalyticsSummary, RecentEventItem, TodosOut, TodoItem, TrendPoint } from '@/types'
 import { STATUS_LIST } from '@/constants/enums'
 import { formatShortTime } from '@/utils/format'
 

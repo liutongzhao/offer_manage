@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Attachment } from '@/types'
 import { ATTACHMENT_TYPES } from '@/constants/enums'
@@ -93,13 +93,27 @@ function openLightbox(a: Attachment) {
   lightboxVisible.value = true
 }
 
-const lightboxUrls = computed(() =>
-  props.attachments.filter(isImage).map((a) => getAttachmentUrl(a.id)),
+/* 预签名 URL 缓存：按附件 id 异步获取（Promise 不能直接绑到 img src） */
+const urlCache = ref<Record<number, string>>({})
+
+async function loadUrl(a: Attachment) {
+  if (urlCache.value[a.id]) return
+  try {
+    urlCache.value[a.id] = await getAttachmentUrl(a.id)
+  } catch {
+    /* 存储服务不可用时静默失败，缩略图回退为图标 */
+  }
+}
+
+watch(
+  () => props.attachments,
+  (list) => list.filter(isImage).forEach(loadUrl),
+  { immediate: true },
 )
 
-function onLightboxReady(urlPromise: Promise<string>) {
-  return urlPromise
-}
+const lightboxUrls = computed(() =>
+  props.attachments.filter(isImage).map((a) => urlCache.value[a.id] ?? ''),
+)
 </script>
 
 <template>
@@ -123,7 +137,7 @@ function onLightboxReady(urlPromise: Promise<string>) {
     <div v-if="attachments.length" class="att-grid">
       <div v-for="a in attachments" :key="a.id" class="att-item">
         <div class="att-thumb" :class="{ img: isImage(a) }" @click="openLightbox(a)">
-          <img v-if="isImage(a)" :src="getAttachmentUrl(a.id)" alt="" @error="($event) => (($event.target as HTMLElement).style.display = 'none')" />
+          <img v-if="isImage(a) && urlCache[a.id]" :src="urlCache[a.id]" alt="" @error="($event) => (($event.target as HTMLElement).style.display = 'none')" />
           <el-icon v-else :size="26"><Document /></el-icon>
         </div>
         <div class="att-info">

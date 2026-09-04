@@ -115,7 +115,7 @@ function copyAction(g: DisplayGroup) {
               </el-icon>
             </div>
             <div v-if="expanded.has(g.key)" class="tl-detail field-list">
-              <div v-for="f in g.fields" :key="f.id" class="field-line">
+              <div v-for="(f, fi) in g.fields" :key="f.id ?? fi" class="field-line">
                 <b>{{ f.field_name }}：</b>
                 <span class="old-val">{{ f.old_value ?? '空' }}</span>
                 <el-icon class="arrow"><Right /></el-icon>

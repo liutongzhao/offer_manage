@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getTodos } from '@/api/analytics'
-import type { TodoItem } from '@/types'
+import type { TodosOut, TodoItem } from '@/types'
 import EmptyState from '@/components/EmptyState.vue'
 import StatusTag from '@/components/StatusTag.vue'
 

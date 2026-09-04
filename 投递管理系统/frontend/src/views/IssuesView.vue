@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import type { Application, Issue } from '@/types'
 import { deleteIssue, getIssues } from '@/api/issues'
 import { getApplications } from '@/api/applications'
 import { ISSUE_CATEGORIES, ISSUE_MASTERY, MASTERY_COLOR } from '@/constants/enums'
 import EmptyState from '@/components/EmptyState.vue'
 import IssueFormDrawer from '@/components/IssueFormDrawer.vue'
-import { formatDate } from '@/utils/format'
 
 /** 问题记录（PG-007）：CRUD + 行展开 + 掌握程度就地切换 + 关联投递跳转 */
 const router = useRouter()

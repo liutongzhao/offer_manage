@@ -88,7 +88,10 @@ export interface ApplicationCreate {
   tag_names?: string[]
 }
 
-export type ApplicationUpdate = Partial<ApplicationCreate>
+export type ApplicationUpdate = Partial<ApplicationCreate> & {
+  /** 归档状态（仅更新接口支持） */
+  archived?: boolean
+}
 
 /** 投递列表筛选参数 */
 export interface ApplicationFilters {

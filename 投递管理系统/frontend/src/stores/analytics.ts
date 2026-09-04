@@ -8,7 +8,12 @@ export const useAnalyticsStore = defineStore('analytics', () => {
     total: 0,
     by_type: {},
     by_status: {},
+    by_channel: {},
     issues_total: 0,
+    week_count: 0,
+    interviewing: 0,
+    offered: 0,
+    conversion_rate: 0,
   })
   const loading = ref(false)
 

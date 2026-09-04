@@ -77,7 +77,7 @@ function renderCharts() {
               fontSize: 12,
             },
             itemStyle: {
-              color: echarts.color.interpolate('#2f6fed', '#9dbefd')(1 - i / Math.max(stages.value.length - 1, 1)),
+              color: echarts.color.lerp(1 - i / Math.max(stages.value.length - 1, 1), ['#2f6fed', '#9dbefd']),
               borderRadius: 4,
             },
           })),
