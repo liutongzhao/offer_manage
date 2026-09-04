@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>秋招投递管理系统 · 高保真原型 v1.0</title>
+<style>
+:root{
+  --color-primary-50:#EFF4FF;--color-primary-100:#E8F0FE;--color-primary-200:#C7D9FE;
+  --color-primary-300:#9DBEFD;--color-primary-400:#6E9BF7;--color-primary-500:#2F6FED;
+  --color-primary-600:#1D4ED8;--color-primary-700:#1A43B8;--color-primary-800:#183693;--color-primary-900:#152C70;
+  --color-gray-0:#FFFFFF;--color-gray-25:#FCFCFD;--color-gray-50:#F9FAFB;--color-gray-100:#F2F4F7;
+  --color-gray-200:#E4E7EC;--color-gray-300:#D0D5DD;--color-gray-400:#98A2B3;--color-gray-500:#667085;
+  --color-gray-600:#475467;--color-gray-700:#344054;--color-gray-800:#1D2939;--color-gray-900:#101828;
+  --color-success-solid:#12B76A;--color-success-bg:#E7F8F0;--color-success-text:#067647;
+  --color-warning-solid:#F59E0B;--color-warning-bg:#FEF3E2;--color-warning-text:#B45309;
+  --color-error-solid:#F04438;--color-error-bg:#FEECEB;--color-error-text:#B42318;
+  --color-info-solid:#2F6FED;--color-info-bg:#E8F0FE;--color-info-text:#1D4ED8;
+  --color-teal:#0BA5A5;--color-teal-dark:#0A7B7B;--color-teal-light:#E0F5F5;
+  --color-violet:#7C5CFF;--color-violet-dark:#5B3FDB;--color-violet-light:#F0EBFF;
+  --status-pending-dot:#64748B;--status-pending-bg:#F1F5F9;--status-pending-text:#475569;
+  --status-applied-dot:#2F6FED;--status-applied-bg:#E8F0FE;--status-applied-text:#1D4ED8;
+  --status-written-dot:#7C5CFF;--status-written-bg:#F0EBFF;--status-written-text:#5B3FDB;
+  --status-interviewing-dot:#F59E0B;--status-interviewing-bg:#FEF3E2;--status-interviewing-text:#B45309;
+  --status-offered-dot:#12B76A;--status-offered-bg:#E7F8F0;--status-offered-text:#067647;
+  --status-failed-dot:#F04438;--status-failed-bg:#FEECEB;--status-failed-text:#B42318;
+  --status-declined-dot:#98A2B3;--status-declined-bg:#F2F4F7;--status-declined-text:#667085;
+  --status-noshow-dot:#475467;--status-noshow-bg:#EEF0F3;--status-noshow-text:#344054;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  --font-mono:'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;--sp-16:64px;
+  --radius-xs:4px;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:999px;
+  --shadow-xs:0 1px 2px rgba(16,24,40,.05);
+  --shadow-sm:0 1px 3px rgba(16,24,40,.10),0 1px 2px rgba(16,24,40,.06);
+  --shadow-md:0 4px 8px -2px rgba(16,24,40,.10),0 2px 4px -2px rgba(16,24,40,.06);
+  --shadow-lg:0 12px 16px -4px rgba(16,24,40,.08),0 4px 6px -2px rgba(16,24,40,.03);
+  --transition-fast:120ms ease-out;--transition-normal:200ms cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px;line-height:22px;color:var(--color-gray-800);background:var(--color-gray-50);-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh;max-width:1440px;margin:0 auto;background:var(--color-gray-50)}
+.app.is-mobile{max-width:375px;box-shadow:var(--shadow-xl)}
+
+.sidenav{width:212px;flex-shrink:0;background:var(--color-gray-900);display:flex;flex-direction:column}
+.logo{height:56px;display:flex;align-items:center;gap:8px;padding:0 20px;background:var(--color-gray-800);color:#fff;font-size:15px;font-weight:600;letter-spacing:.5px}
+.logo-mark{width:20px;height:20px;border-radius:5px;background:var(--color-primary-500);display:flex;align-items:center;justify-content:center;font-size:11px}
+.navgroup{padding:12px 0 4px}
+.navgroup-title{padding:8px 20px;font-size:11px;color:var(--color-gray-500);letter-spacing:.5px}
+.navitem{display:flex;align-items:center;gap:10px;height:40px;padding:0 20px;color:#CBD5E1;font-size:14px;cursor:pointer;transition:background var(--transition-fast)}
+.navitem:hover{background:rgba(255,255,255,.06);color:#fff}
+.navitem.is-active{background:var(--color-primary-500);color:#fff;font-weight:500}
+.navitem .ico{width:16px;height:16px;border-radius:4px;background:currentColor;opacity:.55;flex-shrink:0}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:56px;background:var(--color-gray-0);border-bottom:1px solid var(--color-gray-200);display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:20}
+.page-title{font-size:24px;line-height:32px;font-weight:600;color:var(--color-gray-900)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.content{padding:24px;display:flex;flex-direction:column;gap:24px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;transition:background var(--transition-fast),box-shadow var(--transition-fast);font-family:inherit}
+.btn:focus-visible{outline:2px solid var(--color-primary-500);outline-offset:2px}
+.btn-primary{background:var(--color-primary-500);color:#fff}
+.btn-primary:hover{background:var(--color-primary-600)}
+.btn-primary:active{background:var(--color-primary-700)}
+.btn-secondary{background:#fff;color:var(--color-gray-700);border-color:var(--color-gray-200)}
+.btn-secondary:hover{background:var(--color-gray-50);border-color:var(--color-gray-300)}
+.btn-text{background:transparent;color:var(--color-primary-500);padding:0 8px;height:32px}
+.btn-text:hover{background:var(--color-primary-50)}
+.btn-danger{background:#fff;color:var(--color-error-text);border-color:var(--color-error-solid)}
+.btn-danger:hover{background:var(--color-error-bg)}
+.btn-sm{height:28px;padding:0 12px;font-size:13px}
+.btn:disabled{background:var(--color-gray-100);color:var(--color-gray-400);border-color:var(--color-gray-200);cursor:not-allowed}
+
+.input{height:36px;padding:0 12px;border:1px solid var(--color-gray-300);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:#fff;color:var(--color-gray-800);transition:border-color var(--transition-fast),box-shadow var(--transition-fast)}
+.input:focus{outline:none;border-color:var(--color-primary-500);box-shadow:0 0 0 3px rgba(47,111,237,.10)}
+.input::placeholder{color:var(--color-gray-400)}
+
+.card{background:#fff;border:1px solid var(--color-gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-xs);padding:20px}
+.card-title{font-size:16px;line-height:24px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-title .action{margin-left:auto;font-size:13px;font-weight:400;color:var(--color-primary-500);cursor:pointer}
+
+.tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:var(--radius-full);font-size:12px;font-weight:500;line-height:18px;white-space:nowrap}
+.tag .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tag-sm{height:20px;padding:0 6px}
+.s-pending{background:var(--status-pending-bg);color:var(--status-pending-text)}
+.s-applied{background:var(--status-applied-bg);color:var(--status-applied-text)}
+.s-written{background:var(--status-written-bg);color:var(--status-written-text)}
+.s-interviewing{background:var(--status-interviewing-bg);color:var(--status-interviewing-text)}
+.s-offered{background:var(--status-offered-bg);color:var(--status-offered-text)}
+.s-failed{background:var(--status-failed-bg);color:var(--status-failed-text)}
+.s-declined{background:var(--status-declined-bg);color:var(--status-declined-text)}
+.s-noshow{background:var(--status-noshow-bg);color:var(--status-noshow-text)}
+.t-backend{background:var(--color-primary-100);color:var(--color-primary-600)}
+.t-test{background:var(--color-teal-light);color:var(--color-teal-dark)}
+.t-ai{background:var(--color-violet-light);color:var(--color-violet-dark)}
+
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-xs);padding:16px 20px;position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--color-primary-500)}
+.stat.is-info::before{background:var(--color-info-solid)}
+.stat.is-warning::before{background:var(--color-warning-solid)}
+.stat.is-success::before{background:var(--color-success-solid)}
+.stat-label{font-size:13px;color:var(--color-gray-500);line-height:20px}
+.stat-value{font-size:30px;line-height:38px;font-weight:600;font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--color-gray-900)}
+.stat-hint{font-size:12px;color:var(--color-gray-500);line-height:18px}
+
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filterbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;height:40px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:var(--radius-full);background:var(--color-primary-100);color:var(--color-primary-600);font-size:12px;font-weight:500}
+.chip .x{cursor:pointer;opacity:.6;font-size:14px;line-height:1}
+.chip .x:hover{opacity:1}
+.seg{display:inline-flex;background:var(--color-gray-100);border-radius:var(--radius-sm);padding:2px}
+.seg button{height:28px;padding:0 14px;border:none;background:transparent;border-radius:4px;font-size:13px;color:var(--color-gray-600);cursor:pointer;font-family:inherit}
+.seg button.is-active{background:#fff;color:var(--color-gray-800);font-weight:500;box-shadow:var(--shadow-xs)}
+
+.tablewrap{background:#fff;border:1px solid var(--color-gray-200);border-radius:var(--radius-md);box-shadow:var(--shadow-xs);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{height:44px;background:var(--color-gray-50);font-size:13px;font-weight:500;color:var(--color-gray-700);text-align:left;padding:0 16px;border-bottom:1px solid var(--color-gray-100);white-space:nowrap}
+tbody td{height:52px;padding:0 16px;border-bottom:1px solid var(--color-gray-100);font-size:14px;vertical-align:middle}
+tbody tr{cursor:pointer;transition:background var(--transition-fast)}
+tbody tr:hover{background:var(--color-primary-50)}
+tbody tr:last-child td{border-bottom:none}
+.cell-company{font-weight:500;color:var(--color-gray-900);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-job{font-size:15px;font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-mono{font-family:var(--font-mono);font-size:13px;color:var(--color-gray-600);white-space:nowrap}
+.cell-warn{color:var(--color-warning-text);font-weight:500}
+.cell-danger{color:var(--color-error-text);font-weight:500}
+.cell-assets{font-size:12px;color:var(--color-gray-500);white-space:nowrap}
+.empty{padding:64px 24px 48px;text-align:center}
+.empty-ico{width:96px;height:96px;margin:0 auto 16px;border-radius:var(--radius-xl);background:var(--color-primary-100);display:flex;align-items:center;justify-content:center}
+.empty-ico span{width:40px;height:40px;border-radius:var(--radius-md);background:var(--color-primary-500);opacity:.35}
+.empty-title{font-size:16px;font-weight:600;color:var(--color-gray-800);margin-bottom:6px}
+.empty-desc{font-size:14px;color:var(--color-gray-500);margin-bottom:20px;max-width:360px;margin-left:auto;margin-right:auto}
+.skel{height:20px;border-radius:var(--radius-sm);background:linear-gradient(90deg,#F2F4F7 25%,#E4E7EC 37%,#F2F4F7 63%);background-size:400% 100%;animation:shimmer 1.2s linear infinite}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+.alertbar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--color-error-bg);color:var(--color-error-text);border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px}
+
+.twocol{display:grid;grid-template-columns:7fr 5fr;gap:24px;align-items:start}
+.onecol{display:flex;flex-direction:column;gap:16px}
+.detailhead{display:flex;align-items:center;gap:12px;height:64px;background:#fff;border-bottom:1px solid var(--color-gray-200);padding:0 24px;position:sticky;top:56px;z-index:10}
+.detailtitle{font-size:16px;font-weight:600;color:var(--color-gray-900)}
+.descgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.desc-k{font-size:12px;color:var(--color-gray-500);line-height:18px}
+.desc-v{font-size:14px;color:var(--color-gray-800);margin-top:2px}
+
+.tl{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:12px;position:relative;padding-bottom:20px}
+.tl-item:last-child{padding-bottom:0}
+.tl-rail{width:20px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.tl-node{width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--color-primary-500);flex-shrink:0;margin-top:2px}
+.tl-node.is-comm{border-color:var(--color-violet)}
+.tl-node.is-att{border-color:var(--color-teal)}
+.tl-node.is-field{border-color:var(--color-gray-400)}
+.tl-line{width:2px;flex:1;background:var(--color-gray-200);margin:4px 0}
+.tl-body{flex:1;min-width:0}
+.tl-head{display:flex;align-items:baseline;gap:8px}
+.tl-type{font-size:13px;font-weight:500;color:var(--color-gray-700)}
+.tl-time{margin-left:auto;font-size:12px;color:var(--color-gray-500);font-family:var(--font-mono)}
+.tl-content{font-size:13px;color:var(--color-gray-600);margin-top:3px}
+.tl-old{text-decoration:line-through;color:var(--color-gray-400)}
+.tl-new{color:var(--color-gray-800);font-weight:500}
+
+.filerow{display:flex;align-items:center;gap:10px;height:56px;padding:0 10px;border-radius:var(--radius-sm);transition:background var(--transition-fast)}
+.filerow:hover{background:var(--color-gray-50)}
+.thumb{width:40px;height:40px;border-radius:var(--radius-sm);flex-shrink:0}
+.filename{font-size:14px;color:var(--color-gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.filename-sm{font-size:13px}
+.filemeta{font-size:12px;color:var(--color-gray-500)}
+.linkrow{display:flex;align-items:center;gap:8px;height:40px;font-size:14px;color:var(--color-primary-600)}
+.linkrow .ico{width:16px;height:16px;border-radius:4px;background:var(--color-primary-200);flex-shrink:0}
+.uploadzone{border:1px dashed var(--color-gray-300);border-radius:var(--radius-md);background:var(--color-gray-50);height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--color-gray-500);font-size:13px;transition:all var(--transition-fast)}
+.uploadzone:hover{border-color:var(--color-primary-500);background:var(--color-primary-50);color:var(--color-primary-600)}
+
+.todogroup{margin-bottom:8px}
+.todogroup-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--color-gray-700);height:40px}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:var(--radius-full);background:var(--color-gray-100);color:var(--color-gray-600);font-size:12px;font-weight:500}
+.todorow{display:flex;align-items:center;gap:12px;height:56px;padding:0 16px;background:#fff;border:1px solid var(--color-gray-200);border-radius:var(--radius-md);box-shadow:var(--shadow-xs);margin-bottom:8px}
+.urgency{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.u-over{background:var(--color-error-solid)}
+.u-soon{background:var(--color-warning-solid)}
+.u-week{background:var(--color-primary-500)}
+.u-later{background:var(--color-gray-400)}
+.todotext{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todotext b{font-weight:500;color:var(--color-gray-900)}
+
+.chartbox{height:220px;display:flex;align-items:flex-end;gap:10px;padding:16px 4px 0}
+.bar{flex:1;background:var(--color-primary-400);border-radius:4px 4px 0 0;position:relative;min-height:4px}
+.bar span{position:absolute;top:-20px;left:0;right:0;text-align:center;font-size:11px;color:var(--color-gray-500);font-family:var(--font-mono)}
+.barlabel{text-align:center;font-size:11px;color:var(--color-gray-500);padding-top:6px}
+.funnel{display:flex;flex-direction:column;gap:8px}
+.funnelrow{display:flex;align-items:center;gap:12px;font-size:13px}
+.funnellabel{width:60px;color:var(--color-gray-600);flex-shrink:0}
+.funnelbar{height:28px;border-radius:var(--radius-sm);background:var(--color-primary-500);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:12px;font-family:var(--font-mono)}
+.funnelrate{width:70px;text-align:right;color:var(--color-gray-500);font-family:var(--font-mono);font-size:12px}
+
+.hint{font-size:12px;color:var(--color-gray-500);line-height:18px}
+.demobar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:#fff;border:1px dashed var(--color-gray-300);border-radius:var(--radius-md)}
+.demobar-label{font-size:12px;color:var(--color-gray-500);font-weight:500}
+.view{display:none}
+.view.is-active{display:flex;flex-direction:column;gap:24px}
+
+.app.is-mobile .sidenav{display:none}
+.app.is-mobile .content{padding:16px;gap:16px}
+.app.is-mobile .statgrid{grid-template-columns:repeat(2,1fr)}
+.app.is-mobile .twocol{grid-template-columns:1fr}
+.app.is-mobile .descgrid{grid-template-columns:1fr}
+.app.is-mobile .toolbar .desktop-only{display:none}
+.app.is-mobile table{display:none}
+.app.is-mobile .cardlist{display:flex;flex-direction:column;gap:8px}
+.app.is-mobile .topbar{padding:0 16px}
+.app.is-mobile .page-title{font-size:18px;line-height:26px}
+.app.is-mobile .detailhead{padding:0 16px;top:56px;gap:8px}
+.app.is-mobile .detailtitle{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cardlist{display:none}
+.app.is-mobile .cardlist{display:flex;flex-direction:column;gap:8px}
+.mcard{background:#fff;border:1px solid var(--color-gray-200);border-radius:var(--radius-md);padding:12px 14px;box-shadow:var(--shadow-xs);display:flex;flex-direction:column;gap:6px}
+.mcard-row{display:flex;align-items:center;gap:8px}
+.mcard-title{font-size:15px;font-weight:500;color:var(--color-gray-900);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard-sub{font-size:12px;color:var(--color-gray-500);display:flex;gap:12px;font-family:var(--font-mono)}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<aside class="sidenav">
+  <div class="logo"><span class="logo-mark">罩</span>秋招投递管理</div>
+  <div class="navgroup">
+    <div class="navgroup-title">概览</div>
+    <div class="navitem is-active" data-view="dashboard"><span class="ico"></span>投递看板</div>
+  </div>
+  <div class="navgroup">
+    <div class="navgroup-title">求职主线</div>
+    <div class="navitem" data-view="applications"><span class="ico"></span>投递记录</div>
+    <div class="navitem" data-view="detail"><span class="ico"></span>投递详情</div>
+    <div class="navitem" data-view="todos"><span class="ico"></span>待办提醒</div>
+  </div>
+  <div class="navgroup">
+    <div class="navgroup-title">资产库</div>
+    <div class="navitem"><span class="ico"></span>公司管理</div>
+    <div class="navitem"><span class="ico"></span>简历资产</div>
+    <div class="navitem"><span class="ico"></span>问题记录</div>
+  </div>
+  <div class="navgroup">
+    <div class="navgroup-title">分析</div>
+    <div class="navitem" data-view="analytics"><span class="ico"></span>数据统计</div>
+  </div>
+  <div class="navgroup">
+    <div class="navgroup-title">系统</div>
+    <div class="navitem"><span class="ico"></span>数据与设置</div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <span class="page-title" id="topTitle">投递看板</span>
+    <div class="topbar-right">
+      <input class="input" style="width:200px" placeholder="搜索…">
+      <button class="btn btn-primary">+ 新增投递</button>
+      <div class="seg" id="bpSwitch">
+        <button class="is-active" data-bp="desktop">桌面</button>
+        <button data-bp="mobile">移动 375</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- 投递看板 -->
+    <section class="view is-active" id="v-dashboard">
+      <div class="statgrid">
+        <div class="stat"><div class="stat-label">投递总数</div><div class="stat-value">128</div><div class="stat-hint">本周 +12</div></div>
+        <div class="stat is-info"><div class="stat-label">进行中</div><div class="stat-value">50</div><div class="stat-hint">含笔试 7</div></div>
+        <div class="stat is-warning"><div class="stat-label">面试中</div><div class="stat-value">5</div><div class="stat-hint">本周 2</div></div>
+        <div class="stat is-success"><div class="stat-label">已 Offer</div><div class="stat-value">2</div><div class="stat-hint">转化率 1.6%</div></div>
+      </div>
+      <div class="twocol">
+        <div style="display:flex;flex-direction:column;gap:24px">
+          <div class="card">
+            <div class="card-title">状态分布 <span class="action">全部</span></div>
+            <div class="chartbox" style="height:180px">
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:90%"><span>38</span></div><div class="barlabel">已投递</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:48%;background:var(--color-violet)"><span>19</span></div><div class="barlabel">已挂</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:30%;background:var(--color-primary-300)"><span>12</span></div><div class="barlabel">待投递</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:18%;background:var(--color-warning-solid)"><span>7</span></div><div class="barlabel">笔试中</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:12%;background:var(--color-primary-600)"><span>5</span></div><div class="barlabel">面试中</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:5%;background:var(--color-success-solid)"><span>2</span></div><div class="barlabel">已Offer</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">投递趋势（近 8 周）</div>
+            <div class="chartbox" style="height:160px">
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:35%"><span>6</span></div><div class="barlabel">7/14</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:55%"><span>9</span></div><div class="barlabel">7/21</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:40%"><span>7</span></div><div class="barlabel">7/28</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:70%"><span>12</span></div><div class="barlabel">8/04</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:88%"><span>15</span></div><div class="barlabel">8/11</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:62%"><span>10</span></div><div class="barlabel">8/18</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:78%"><span>13</span></div><div class="barlabel">8/25</div></div>
+              <div style="flex:1;display:flex;flex-direction:column"><div class="bar" style="height:72%;background:var(--color-primary-600)"><span>12</span></div><div class="barlabel">9/01</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">待办与提醒 <span class="action">全部</span></div>
+          <div class="todorow" style="margin-bottom:8px"><span class="urgency u-soon"></span><span class="todotext"><b>明天</b> 蚂蚁集团 二面 20:00</span><button class="btn btn-sm btn-secondary">去处理</button></div>
+          <div class="todorow" style="margin-bottom:8px"><span class="urgency u-week"></span><span class="todotext"><b>2 天后</b> 腾讯 笔试截止</span><button class="btn btn-sm btn-secondary">去处理</button></div>
+          <div class="todorow" style="margin-bottom:8px"><span class="urgency u-week"></span><span class="todotext"><b>3 条</b> 投递待跟进</span><button class="btn btn-sm btn-secondary">去处理</button></div>
+          <div class="todorow"><span class="urgency u-later"></span><span class="todotext"><b>12 条</b> 已投未回应</span><button class="btn btn-sm btn-text">查看</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">近期动态</div>
+        <div class="tl">
+          <div class="tl-item"><div class="tl-rail"><div class="tl-node"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">状态变更 · 字节跳动</span><span class="tl-time">09-04 14:20</span></div><div class="tl-content"><span class="tl-old">已投递</span> → <span class="tl-new">笔试中</span></div></div></div>
+          <div class="tl-item"><div class="tl-rail"><div class="tl-node is-comm"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">沟通记录 · 蚂蚁集团 · 微信</span><span class="tl-time">09-03 19:05</span></div><div class="tl-content">HR 约本周四晚 8 点一面</div></div></div>
+          <div class="tl-item"><div class="tl-rail"><div class="tl-node is-att"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">附件上传 · 字节跳动</span><span class="tl-time">09-02 10:33</span></div><div class="tl-content">JD截图-字节跳动.png</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 投递记录 -->
+    <section class="view" id="v-applications">
+      <div class="demobar">
+        <span class="demobar-label">状态演示</span>
+        <div class="seg" id="stateSwitch">
+          <button class="is-active" data-state="default">默认</button>
+          <button data-state="loading">加载中</button>
+          <button data-state="empty">空数据</button>
+          <button data-state="noresult">无结果</button>
+          <button data-state="error">服务异常</button>
+        </div>
+        <span class="hint">对应手册 §2.6 边界场景 EDGE-02 / 03 / 04</span>
+      </div>
+
+      <div id="appNormal">
+        <div class="toolbar">
+          <input class="input" style="width:320px" placeholder="搜索公司、岗位、备注…">
+          <select class="input" style="width:130px"><option>全部类型</option></select>
+          <select class="input" style="width:130px"><option>全部状态</option></select>
+          <select class="input" style="width:120px"><option>全部城市</option></select>
+          <button class="btn btn-secondary desktop-only">更多筛选</button>
+          <div class="seg" style="margin-left:auto"><button class="is-active">列表</button><button>看板</button></div>
+        </div>
+        <div class="filterbar">
+          <span class="chip">后端开发 <span class="x">×</span></span>
+          <span class="chip">面试中 <span class="x">×</span></span>
+          <span class="chip">杭州 <span class="x">×</span></span>
+          <button class="btn btn-text btn-sm">清空筛选</button>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr>
+              <th style="width:140px">公司</th><th>岗位</th><th style="width:110px">状态</th>
+              <th style="width:100px">类型</th><th style="width:80px">城市</th><th style="width:80px">渠道</th>
+              <th style="width:110px">投递日期</th><th style="width:110px">截止日期</th>
+              <th style="width:70px">素材</th><th style="width:110px">操作</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="cardlist" id="cardlist"></div>
+        <div style="display:flex;align-items:center;height:56px;justify-content:flex-end;gap:12px">
+          <span class="hint">共 128 条</span>
+          <div class="seg"><button>‹</button><button class="is-active">1</button><button>2</button><button>3</button><button>›</button></div>
+        </div>
+      </div>
+
+      <div id="appAlt" style="display:none"></div>
+    </section>
+
+    <!-- 投递详情 -->
+    <section class="view" id="v-detail">
+      <div class="detailhead">
+        <button class="btn btn-text">‹ 返回</button>
+        <span class="detailtitle">字节跳动 · Java 后端开发工程师（校招）</span>
+        <span class="tag s-interviewing"><span class="dot" style="background:var(--status-interviewing-dot)"></span>面试中</span>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <select class="input" style="width:110px"><option>改状态</option></select>
+          <button class="btn btn-secondary">编辑</button>
+        </div>
+      </div>
+      <div class="twocol">
+        <div class="onecol">
+          <div class="card">
+            <div class="card-title">基本信息</div>
+            <div class="descgrid">
+              <div><div class="desc-k">公司</div><div class="desc-v">字节跳动</div></div>
+              <div><div class="desc-k">投递类型</div><div class="desc-v" style="color:var(--color-primary-600)">后端开发</div></div>
+              <div><div class="desc-k">投递渠道</div><div class="desc-v">内推</div></div>
+              <div><div class="desc-k">工作城市</div><div class="desc-v">杭州</div></div>
+              <div><div class="desc-k">投递日期</div><div class="desc-v" style="font-family:var(--font-mono)">2026-09-01</div></div>
+              <div><div class="desc-k">截止日期</div><div class="desc-v" style="font-family:var(--font-mono);color:var(--color-warning-text);font-weight:500">2026-09-30</div></div>
+              <div><div class="desc-k">薪资范围</div><div class="desc-v">25K × 15</div></div>
+              <div><div class="desc-k">内推人</div><div class="desc-v">张学长</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">时间线 <span class="action">+ 记一笔</span></div>
+            <div class="seg" style="margin-bottom:16px"><button class="is-active">全部</button><button>状态</button><button>沟通</button><button>附件</button><button>问题</button></div>
+            <div class="tl">
+              <div class="tl-item"><div class="tl-rail"><div class="tl-node"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">状态变更</span><span class="tl-time">09-04 14:20</span></div><div class="tl-content"><span class="tl-old">已投递</span> → <span class="tl-new">笔试中</span></div><div class="tl-content" style="color:var(--color-gray-400);font-size:12px">来源：代理录入</div></div></div>
+              <div class="tl-item"><div class="tl-rail"><div class="tl-node is-comm"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">沟通记录 · HR · 微信</span><span class="tl-time">09-03 19:05</span></div><div class="tl-content">约本周三晚 8 点线上笔试</div><div class="tl-content" style="font-size:12px;color:var(--color-gray-500)">我方动作：准备算法题复习</div></div></div>
+              <div class="tl-item"><div class="tl-rail"><div class="tl-node is-att"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">附件上传</span><span class="tl-time">09-02 10:33</span></div><div class="tl-content">JD截图-字节跳动.png</div></div></div>
+              <div class="tl-item"><div class="tl-rail"><div class="tl-node is-field"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">字段变更</span><span class="tl-time">09-02 10:30</span></div><div class="tl-content">修改了 3 个字段 <span style="color:var(--color-primary-500);cursor:pointer">展开</span></div></div></div>
+              <div class="tl-item"><div class="tl-rail"><div class="tl-node"></div></div><div class="tl-body"><div class="tl-head"><span class="tl-type">创建投递记录</span><span class="tl-time">09-01 09:12</span></div><div class="tl-content">来源：代理录入</div></div></div>
+            </div>
+            <div style="text-align:center;margin-top:16px"><button class="btn btn-text btn-sm">加载更早记录</button></div>
+          </div>
+        </div>
+        <div class="onecol">
+          <div class="card" style="background:var(--color-primary-100)">
+            <div class="card-title" style="color:var(--color-primary-600);margin-bottom:6px">当前状态 · 二面</div>
+            <div style="font-size:12px;color:var(--color-primary-600);margin-bottom:12px">上次更新 09-04 14:20</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-primary btn-sm">推进到下一轮</button>
+              <button class="btn btn-secondary btn-sm" style="background:#fff">标记结果</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">简历 <span class="action">更换</span></div>
+            <div class="filerow">
+              <div class="thumb" style="background:var(--color-error-bg)"></div>
+              <div style="flex:1;min-width:0"><div class="filename">柳铜罩简历-字节版-v2.pdf</div><div class="filemeta">392 KB · 09-02 上传</div></div>
+              <button class="btn btn-text btn-sm">预览</button>
+            </div>
+            <div style="font-size:12px;color:var(--color-gray-500);margin-top:8px">针对性修改：突出 Java 并发与 Redis 项目经历</div>
+          </div>
+          <div class="card">
+            <div class="card-title">附件 · 3 <span class="action">+ 上传</span></div>
+            <div style="display:flex;gap:6px;margin-bottom:12px">
+              <div class="thumb" style="background:var(--color-violet-light)"></div>
+              <div class="thumb" style="background:var(--color-teal-light)"></div>
+              <div class="thumb" style="background:var(--color-success-bg)"></div>
+            </div>
+            <div class="uploadzone">拖拽文件到此处，或点击上传<br><span style="font-size:12px">支持 JPG / PNG / PDF，单个 ≤ 20MB</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">链接 · 2 <span class="action">+ 添加</span></div>
+            <div class="linkrow"><span class="ico"></span>投递入口<span class="hint" style="margin-left:auto">↗</span></div>
+            <div class="linkrow"><span class="ico"></span>JD 详情<span class="hint" style="margin-left:auto">↗</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">关联问题 · 2 <span class="action">新增</span></div>
+            <div class="filerow" style="height:44px"><div style="flex:1;min-width:0"><div class="filename filename-sm">Redis 持久化机制与选型</div></div><span class="tag s-interviewing"><span class="dot" style="background:var(--status-interviewing-dot)"></span>待复习</span></div>
+            <div class="filerow" style="height:44px"><div style="flex:1;min-width:0"><div class="filename filename-sm">线程池参数如何设置</div></div><span class="tag s-offered"><span class="dot" style="background:var(--status-offered-dot)"></span>已掌握</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 待办提醒 -->
+    <section class="view" id="v-todos">
+      <div style="max-width:900px;display:flex;flex-direction:column;gap:8px">
+        <div class="todogroup">
+          <div class="todogroup-title">已逾期 <span class="badge">1</span></div>
+          <div class="todorow"><span class="urgency u-over"></span><span class="todotext"><b>腾讯科技</b> 笔试已截止（09-02）</span><button class="btn btn-sm btn-secondary">去处理</button><button class="btn btn-sm btn-text">忽略</button></div>
+        </div>
+        <div class="todogroup">
+          <div class="todogroup-title">今天 / 明天 <span class="badge">2</span></div>
+          <div class="todorow"><span class="urgency u-soon"></span><span class="todotext"><b>明天 20:00</b> 蚂蚁集团 二面</span><button class="btn btn-sm btn-secondary">去处理</button><button class="btn btn-sm btn-text">完成</button></div>
+          <div class="todorow"><span class="urgency u-soon"></span><span class="todotext"><b>今天</b> 美团 截止投递</span><button class="btn btn-sm btn-secondary">去处理</button><button class="btn btn-sm btn-text">完成</button></div>
+        </div>
+        <div class="todogroup">
+          <div class="todogroup-title">本周 <span class="badge">2</span></div>
+          <div class="todorow"><span class="urgency u-week"></span><span class="todotext"><b>字节跳动</b> 投递 3 天无回应，建议跟进</span><button class="btn btn-sm btn-secondary">去跟进</button><button class="btn btn-sm btn-text">完成</button></div>
+          <div class="todorow"><span class="urgency u-week"></span><span class="todotext"><b>09-08</b> 网易 笔试</span><button class="btn btn-sm btn-secondary">去处理</button><button class="btn btn-sm btn-text">完成</button></div>
+        </div>
+        <div class="todogroup">
+          <div class="todogroup-title" style="cursor:pointer">已完成（3） <span class="badge">▴</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据统计 -->
+    <section class="view" id="v-analytics">
+      <div class="card">
+        <div class="card-title">转化漏斗 <span class="action">近 90 天</span></div>
+        <div class="funnel">
+          <div class="funnelrow"><span class="funnellabel">投递</span><div class="funnelbar" style="width:100%">128</div><span class="funnelrate">100%</span></div>
+          <div class="funnelrow"><span class="funnellabel">笔试</span><div class="funnelbar" style="width:32.8%;background:var(--color-primary-400)">42</div><span class="funnelrate">32.8%</span></div>
+          <div class="funnelrow"><span class="funnellabel">面试</span><div class="funnelbar" style="width:11.7%;background:var(--color-primary-300)">15</div><span class="funnelrate">11.7%</span></div>
+          <div class="funnelrow"><span class="funnellabel">Offer</span><div class="funnelbar" style="width:1.6%;background:var(--color-primary-200);min-width:36px">2</div><span class="funnelrate">1.6%</span></div>
+        </div>
+        <div class="hint" style="margin-top:12px">口径：分母 = 进入该环节总数（含已流出），分子 = 曾到达该环节数（需求 Q-6 建议值）</div>
+      </div>
+      <div class="twocol">
+        <div class="card">
+          <div class="card-title">投递类型分布</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+            <div><div style="display:flex;font-size:13px;margin-bottom:4px"><span>后端开发</span><span style="margin-left:auto;font-family:var(--font-mono)">86</span></div><div style="height:8px;background:var(--color-gray-100);border-radius:4px"><div style="width:67%;height:8px;background:var(--color-primary-500);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;font-size:13px;margin-bottom:4px"><span>测试开发</span><span style="margin-left:auto;font-family:var(--font-mono)">24</span></div><div style="height:8px;background:var(--color-gray-100);border-radius:4px"><div style="width:19%;height:8px;background:var(--color-teal);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;font-size:13px;margin-bottom:4px"><span>AI 开发</span><span style="margin-left:auto;font-family:var(--font-mono)">18</span></div><div style="height:8px;background:var(--color-gray-100);border-radius:4px"><div style="width:14%;height:8px;background:var(--color-violet);border-radius:4px"></div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">渠道命中率</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+            <div><div style="display:flex;font-size:13px;margin-bottom:4px"><span>内推</span><span style="margin-left:auto;font-family:var(--font-mono)">18.2%</span></div><div style="height:8px;background:var(--color-gray-100);border-radius:4px"><div style="width:100%;height:8px;background:var(--color-primary-500);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;font-size:13px;margin-bottom:4px"><span>官网</span><span style="margin-left:auto;font-family:var(--font-mono)">9.4%</span></div><div style="height:8px;background:var(--color-gray-100);border-radius:4px"><div style="width:52%;height:8px;background:var(--color-primary-500);border-radius:4px"></div></div></div>
+            <div><div style="display:flex;font-size:13px;margin-bottom:4px"><span>招聘平台</span><span style="margin-left:auto;font-family:var(--font-mono)">5.1%</span></div><div style="height:8px;background:var(--color-gray-100);border-radius:4px"><div style="width:28%;height:8px;background:var(--color-primary-500);border-radius:4px"></div></div></div>
+          </div>
+          <div class="hint" style="margin-top:12px">命中率 = 进入面试环节数 / 该渠道投递数</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var rows=[
+    ['字节跳动','Java 后端开发工程师（校招）','interviewing','面试中','backend','后端开发','杭州','内推','2026-09-01','2026-09-30','🔗2 📎3'],
+    ['蚂蚁集团','Java 开发工程师','written','笔试中','backend','后端开发','杭州','官网','2026-09-02','2026-09-25','🔗1 📎2'],
+    ['腾讯科技','测试开发工程师','applied','已投递','test','测试开发','深圳','内推','2026-09-03','2026-10-08','🔗1'],
+    ['美团','后端开发工程师（AI方向）','offered','已Offer','ai','AI开发','北京','宣讲会','2026-08-28','2026-09-10','📎1'],
+    ['百度','Java 后端工程师','failed','已挂','backend','后端开发','北京','招聘平台','2026-08-20','2026-09-05','🔗1'],
+    ['网易','大模型应用开发','pending','待投递','ai','AI开发','杭州','内推','—','2026-09-08','—'],
+    ['京东','测试开发工程师','declined','已拒绝','test','测试开发','北京','官网','2026-08-15','—','📎1'],
+    ['字节跳动','AI 应用后端工程师','noshow','爽约','ai','AI开发','上海','内推','2026-08-10','—','—']
+  ];
+  var dotVar={'pending':'--status-pending-dot','applied':'--status-applied-dot','written':'--status-written-dot','interviewing':'--status-interviewing-dot','offered':'--status-offered-dot','failed':'--status-failed-dot','declined':'--status-declined-dot','noshow':'--status-noshow-dot'};
+  function deadlineCell(d){
+    if(d==='—') return '<td class="cell-mono">—</td>';
+    var diff=Math.round((new Date(d)-new Date('2026-09-04'))/86400000);
+    var cls=diff<0?'cell-danger':(diff<=3?'cell-warn':'cell-mono');
+    return '<td class="'+cls+'">'+d+'</td>';
+  }
+  var tb=document.getElementById('tbody');
+  tb.innerHTML=rows.map(function(r){
+    var dv=dotVar[r[2]];
+    return '<tr><td class="cell-company">'+r[0]+'</td><td class="cell-job">'+r[1]+'</td>'+
+      '<td><span class="tag s-'+r[2]+'"><span class="dot" style="background:var('+dv+')"></span>'+r[3]+'</span></td>'+
+      '<td><span class="tag t-'+r[4]+'"><span class="dot" style="background:currentColor"></span>'+r[5]+'</span></td>'+
+      '<td>'+r[6]+'</td><td style="color:var(--color-gray-600)">'+r[7]+'</td>'+
+      '<td class="cell-mono">'+r[8]+'</td>'+deadlineCell(r[9])+
+      '<td class="cell-assets">'+r[10]+'</td>'+
+      '<td><button class="btn btn-text btn-sm">编辑</button><button class="btn btn-text btn-sm">⋯</button></td></tr>';
+  }).join('');
+
+  var cl=document.getElementById('cardlist');
+  cl.innerHTML=rows.map(function(r){
+    var dv=dotVar[r[2]];
+    return '<div class="mcard"><div class="mcard-row"><span class="mcard-title">'+r[1]+'</span>'+
+      '<span class="tag s-'+r[2]+'"><span class="dot" style="background:var('+dv+')"></span>'+r[3]+'</span></div>'+
+      '<div class="mcard-sub"><span>'+r[0]+'</span><span>'+r[6]+'</span><span>'+r[8]+'</span></div></div>';
+  }).join('');
+
+  var alt=document.getElementById('appAlt');
+  var normal=document.getElementById('appNormal');
+  function tableWrap(inner){return '<div class="tablewrap">'+inner+'</div>';}
+  var states={
+    loading: tableWrap('<table><thead><tr><th style="width:140px">公司</th><th>岗位</th><th style="width:110px">状态</th><th style="width:100px">类型</th></tr></thead><tbody>'+
+      Array(8).fill('<tr><td colspan="4" style="height:52px"><div class="skel" style="width:80%"></div></td></tr>').join('')+'</tbody></table>'),
+    empty: tableWrap('<div class="empty"><div class="empty-ico"><span></span></div><div class="empty-title">还没有投递记录</div><div class="empty-desc">创建第一条投递，开始追踪你的秋招进度</div><button class="btn btn-primary">+ 新增投递</button></div>'),
+    noresult: tableWrap('<div class="empty"><div class="empty-ico"><span></span></div><div class="empty-title">没有符合条件的记录</div><div class="empty-desc">试试减少筛选条件，或清空后重新筛选</div><button class="btn btn-secondary">清空筛选</button></div>'),
+    error: '<div class="alertbar">无法连接到后端服务（127.0.0.1:8000）　<button class="btn btn-sm btn-danger" style="background:#fff">重试</button></div>'+
+      tableWrap('<div class="empty"><div class="empty-ico" style="background:var(--color-error-bg)"><span style="background:var(--color-error-solid)"></span></div><div class="empty-title">数据加载失败</div><div class="empty-desc">后端服务未启动或连接超时。请确认服务已运行后重试。</div><button class="btn btn-secondary">重试</button></div>')
+  };
+  document.getElementById('stateSwitch').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-state]'); if(!b) return;
+    [].forEach.call(this.children,function(x){x.classList.remove('is-active')});
+    b.classList.add('is-active');
+    var s=b.dataset.state;
+    if(s==='default'){normal.style.display='';alt.style.display='none';alt.innerHTML='';}
+    else{normal.style.display='none';alt.style.display='';alt.innerHTML=states[s];}
+  });
+
+  var titles={dashboard:'投递看板',applications:'投递记录',detail:'投递详情',todos:'待办提醒',analytics:'数据统计'};
+  var views={dashboard:'v-dashboard',applications:'v-applications',detail:'v-detail',todos:'v-todos',analytics:'v-analytics'};
+  document.querySelector('.sidenav').addEventListener('click',function(e){
+    var it=e.target.closest('.navitem[data-view]'); if(!it) return;
+    [].forEach.call(document.querySelectorAll('.navitem'),function(x){x.classList.remove('is-active')});
+    it.classList.add('is-active');
+    [].forEach.call(document.querySelectorAll('.view'),function(v){v.classList.remove('is-active')});
+    document.getElementById(views[it.dataset.view]).classList.add('is-active');
+    document.getElementById('topTitle').textContent=titles[it.dataset.view];
+    window.scrollTo(0,0);
+  });
+
+  document.getElementById('bpSwitch').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-bp]'); if(!b) return;
+    [].forEach.call(this.children,function(x){x.classList.remove('is-active')});
+    b.classList.add('is-active');
+    document.getElementById('app').classList.toggle('is-mobile',b.dataset.bp==='mobile');
+  });
+})();
+</script>
+</body>
+</html>
