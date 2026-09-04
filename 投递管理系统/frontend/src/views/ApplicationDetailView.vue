@@ -13,7 +13,7 @@ import type {
 import { getApplication, getTimeline, updateApplication } from '@/api/applications'
 import { getCommunications, createCommunication } from '@/api/communications'
 import { getAttachments } from '@/api/attachments'
-import { getResumes, getResumeUrl } from '@/api/resumes'
+import { getResumes, getResumeUrl, updateResume } from '@/api/resumes'
 import { getIssues } from '@/api/issues'
 import { setApplicationTags } from '@/api/applications'
 import { COMMUNICATION_METHODS, LINK_TYPES, STATUS_LIST, TERMINAL_STATUSES } from '@/constants/enums'
@@ -37,6 +37,8 @@ const timeline = ref<TimelineItem[]>([])
 const links = ref<ApplicationLink[]>([])
 const attachments = ref<Attachment[]>([])
 const resumes = ref<Resume[]>([])
+const allResumes = ref<Resume[]>([])
+const linkResumeId = ref<number | null>(null)
 const relatedIssues = ref<Issue[]>([])
 const loading = ref(true)
 const notFound = ref(false)
@@ -56,8 +58,9 @@ async function loadAll() {
     links.value = ls
     attachments.value = atts
     relatedIssues.value = iss as Issue[]
-    // 本投递关联的简历
-    resumes.value = (await getResumes()).filter((r) => r.application_id === appId.value)
+    // 全部简历资产（用于展示本投递关联项 + 关联选择器）
+    allResumes.value = await getResumes()
+    resumes.value = allResumes.value.filter((r) => r.application_id === appId.value)
   } catch {
     notFound.value = true
   } finally {
@@ -160,6 +163,32 @@ const issueFormVisible = ref(false)
 async function previewResume(r: Resume) {
   const url = await getResumeUrl(r.id)
   window.open(url, '_blank')
+}
+
+/** 把已有简历关联到本投递 */
+async function linkResume() {
+  if (linkResumeId.value == null) return
+  try {
+    await updateResume(linkResumeId.value, { applicationId: appId.value })
+    ElMessage.success('简历已关联到本投递')
+    linkResumeId.value = null
+    allResumes.value = await getResumes()
+    resumes.value = allResumes.value.filter((r) => r.application_id === appId.value)
+  } catch {
+    ElMessage.error('关联失败，请重试')
+  }
+}
+
+/** 解除简历与本投递的关联 */
+async function unlinkResume(r: Resume) {
+  try {
+    await updateResume(r.id, { applicationId: null })
+    ElMessage.success('已解除关联')
+    allResumes.value = await getResumes()
+    resumes.value = allResumes.value.filter((x) => x.application_id === appId.value)
+  } catch {
+    ElMessage.error('操作失败，请重试')
+  }
 }
 
 function openIssue(issueId: number) {
@@ -280,9 +309,32 @@ void openIssue
               <el-tag v-if="r.version" size="small" effect="plain">{{ r.version }}</el-tag>
               <el-tag v-if="r.is_base" size="small" type="warning" effect="plain">初始</el-tag>
               <el-button link type="primary" size="small" @click="previewResume(r)">预览</el-button>
+              <el-button link type="danger" size="small" @click="unlinkResume(r)">解除关联</el-button>
             </div>
           </template>
-          <div v-else class="muted-box">本次投递暂未关联简历</div>
+          <template v-else>
+            <div class="muted-box">本次投递暂未关联简历</div>
+            <div class="link-resume-row">
+              <el-select
+                v-model="linkResumeId"
+                clearable
+                filterable
+                size="small"
+                placeholder="从简历资产中选择"
+                style="flex: 1"
+              >
+                <el-option
+                  v-for="r in allResumes"
+                  :key="r.id"
+                  :label="`${r.is_base ? '★ ' : ''}${r.filename}${r.version ? '（' + r.version + '）' : ''}`"
+                  :value="r.id"
+                />
+              </el-select>
+              <el-button type="primary" size="small" :disabled="linkResumeId == null" @click="linkResume">
+                关联
+              </el-button>
+            </div>
+          </template>
         </div>
 
         <div class="app-card">
@@ -486,6 +538,13 @@ void openIssue
   font-size: var(--fs-sm);
   color: var(--color-gray-400);
   padding: var(--sp-2) 0;
+}
+
+.link-resume-row {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  margin-top: var(--sp-1);
 }
 
 .issue-row {

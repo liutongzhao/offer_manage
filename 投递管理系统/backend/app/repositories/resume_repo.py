@@ -43,3 +43,12 @@ def list_all(db: Session, skip: int = 0, limit: int = 100) -> list[Resume]:
 def delete(db: Session, obj: Resume) -> None:
     db.delete(obj)
     db.commit()
+
+
+def update(db: Session, obj: Resume, fields: dict) -> Resume:
+    """部分更新简历记录，仅应用显式传入的字段。"""
+    for key, value in fields.items():
+        setattr(obj, key, value)
+    db.commit()
+    db.refresh(obj)
+    return obj

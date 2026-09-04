@@ -5,6 +5,23 @@ export const getResumes = () => unwrap<Resume[]>(client.get('/resumes'))
 export const deleteResume = (id: number) =>
   unwrap<unknown>(client.delete(`/resumes/${id}`))
 
+export interface ResumeUpdate {
+  applicationId?: number | null
+  company?: string | null
+  version?: string | null
+  isBase?: boolean
+}
+
+/** 部分更新简历（如把已有简历关联到投递），字段 camelCase → snake_case 对齐后端 */
+export function updateResume(id: number, data: ResumeUpdate) {
+  const payload: Record<string, unknown> = {}
+  if ('applicationId' in data) payload.application_id = data.applicationId
+  if ('company' in data) payload.company = data.company
+  if ('version' in data) payload.version = data.version
+  if ('isBase' in data) payload.is_base = data.isBase
+  return unwrap<Resume>(client.patch(`/resumes/${id}`, payload))
+}
+
 /** 获取简历预签名访问地址（后端只提供 /{id}/url，无详情路由） */
 export const getResumeUrl = (id: number) =>
   unwrap<string>(client.get(`/resumes/${id}/url`))

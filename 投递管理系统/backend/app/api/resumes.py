@@ -1,4 +1,4 @@
-"""简历资产路由层（文件上传 / 预览 / 删除）。"""
+"""简历资产路由层（文件上传 / 预览 / 关联更新 / 删除）。"""
 import os
 import uuid
 
@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_db
 from app.schemas.common import ApiResponse
-from app.schemas.resume import ResumeOut
+from app.schemas.resume import ResumeOut, ResumeUpdate
 from app.services import resume_service
 from app.storage import minio_client
 
@@ -56,6 +56,16 @@ def list_all(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 def get_url(id: int, db: Session = Depends(get_db)):
     obj = resume_service.get_or_404(db, id)
     return ApiResponse(data=minio_client.get_presigned_url(obj.object_key))
+
+
+@router.patch("/{id}", response_model=ApiResponse[ResumeOut])
+def update(id: int, payload: ResumeUpdate, db: Session = Depends(get_db)):
+    """部分更新简历：主要用于把已有简历关联到投递（application_id）。"""
+    fields = payload.model_dump(exclude_unset=True)
+    if not fields:
+        raise HTTPException(status_code=400, detail="未提供任何更新字段")
+    rec = resume_service.update_resume(db, id, fields)
+    return ApiResponse(data=ResumeOut.model_validate(rec))
 
 
 @router.delete("/{id}", response_model=ApiResponse[None])

@@ -10,6 +10,10 @@ import {
 } from '@/constants/enums'
 import { createCompany, getCompanies } from '@/api/companies'
 import { createApplication, updateApplication } from '@/api/applications'
+import { getResumes, uploadResume, updateResume } from '@/api/resumes'
+import { uploadAttachment } from '@/api/attachments'
+import { ATTACHMENT_TYPES } from '@/constants/enums'
+import type { Resume } from '@/types'
 
 /** 新增/编辑投递抽屉（PG-010，5 分组表单） */
 const props = defineProps<{
@@ -71,6 +75,45 @@ const emptyForm = (): FormModel => ({
 const form = reactive<FormModel>(emptyForm())
 const newCompanyName = ref('')
 
+/* ── 投递材料（仅新增模式）：简历关联 + 附件暂存 ── */
+const resumeOptions = ref<Resume[]>([])
+const selectedResumeId = ref<number | null>(null)
+const pendingResumeFile = ref<File | null>(null)
+interface PendingAttachment {
+  file: File
+  attType: string
+}
+const pendingFiles = ref<PendingAttachment[]>([])
+const resumeFileInput = ref<HTMLInputElement | null>(null)
+const attFileInput = ref<HTMLInputElement | null>(null)
+
+function onResumeFileChosen(e: Event) {
+  const input = e.target as HTMLInputElement
+  const f = input.files?.[0]
+  if (f) {
+    pendingResumeFile.value = f
+    selectedResumeId.value = null // 上传新简历与选择已有互斥
+  }
+  input.value = ''
+}
+
+function onAttFilesChosen(e: Event) {
+  const input = e.target as HTMLInputElement
+  const files = Array.from(input.files ?? [])
+  for (const f of files) {
+    pendingFiles.value.push({ file: f, attType: 'JD截图' })
+  }
+  input.value = ''
+}
+
+function removePendingFile(idx: number) {
+  pendingFiles.value.splice(idx, 1)
+}
+
+function clearPendingResumeFile() {
+  pendingResumeFile.value = null
+}
+
 const rules = {
   position: [{ required: true, message: '请填写岗位名称', trigger: 'blur' }],
   type: [{ required: true, message: '请选择投递类型', trigger: 'change' }],
@@ -106,6 +149,17 @@ watch(
       Object.assign(form, emptyForm())
       companyIdOrNew.value = props.defaultCompanyId ?? ''
       newCompanyName.value = ''
+      // 新增模式：加载简历资产供关联选择，并清空暂存素材
+      selectedResumeId.value = null
+      pendingResumeFile.value = null
+      pendingFiles.value = []
+      getResumes()
+        .then((list) => {
+          resumeOptions.value = list
+        })
+        .catch(() => {
+          resumeOptions.value = []
+        })
     }
   },
 )
@@ -188,6 +242,8 @@ async function onSave() {
       ElMessage.success('已保存修改')
     } else {
       saved = await createApplication(payload)
+      // 创建成功后，处理投递材料（失败仅警告，不回滚主记录）
+      await saveMaterials(saved)
       ElMessage.success(`已新增投递：${form.position}`)
     }
     emit('update:visible', false)
@@ -196,6 +252,43 @@ async function onSave() {
     /* 失败时抽屉保持打开，不丢数据 */
   } finally {
     saving.value = false
+  }
+}
+
+/** 创建投递后保存材料：关联已有简历 / 上传新简历 / 逐个上传附件 */
+async function saveMaterials(app: Application) {
+  const companyName =
+    typeof companyIdOrNew.value === 'number'
+      ? companyOptions.value.find((c) => c.id === companyIdOrNew.value)?.name ?? ''
+      : newCompanyName.value.trim()
+
+  try {
+    if (pendingResumeFile.value) {
+      // 上传新简历并直接关联本投递
+      await uploadResume({
+        file: pendingResumeFile.value,
+        applicationId: app.id,
+        company: companyName || null,
+        isBase: false,
+      })
+    } else if (selectedResumeId.value != null) {
+      // 把已有简历关联到本投递
+      await updateResume(selectedResumeId.value, { applicationId: app.id })
+    }
+  } catch {
+    ElMessage.warning('简历关联失败，可在投递详情页重试')
+  }
+
+  if (pendingFiles.value.length) {
+    const results = await Promise.allSettled(
+      pendingFiles.value.map((p) =>
+        uploadAttachment({ applicationId: app.id, file: p.file, attType: p.attType }),
+      ),
+    )
+    const failed = results.filter((r) => r.status === 'rejected').length
+    if (failed > 0) {
+      ElMessage.warning(`${failed} 个附件上传失败，可到投递详情页重新上传`)
+    }
   }
 }
 
@@ -325,6 +418,69 @@ function onClose() {
       <el-form-item label="备注">
         <el-input v-model="form.notes" type="textarea" :rows="2" />
       </el-form-item>
+
+      <template v-if="!editing">
+        <div class="group-title">投递材料（可选，保存后自动归档到本投递）</div>
+        <el-form-item label="投递简历">
+          <div class="material-block">
+            <el-select
+              v-model="selectedResumeId"
+              clearable
+              placeholder="选择已有简历"
+              :disabled="!!pendingResumeFile"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="r in resumeOptions"
+                :key="r.id"
+                :label="`${r.is_base ? '★ ' : ''}${r.filename}${r.version ? '（' + r.version + '）' : ''}`"
+                :value="r.id"
+              />
+            </el-select>
+            <div class="material-hint">
+              或
+              <el-button text type="primary" size="small" @click="resumeFileInput?.click()">
+                上传新简历文件
+              </el-button>
+              <template v-if="pendingResumeFile">
+                ：{{ pendingResumeFile.name }}
+                <el-button text size="small" @click="clearPendingResumeFile">移除</el-button>
+              </template>
+            </div>
+            <input
+              ref="resumeFileInput"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              style="display: none"
+              @change="onResumeFileChosen"
+            />
+          </div>
+        </el-form-item>
+        <el-form-item label="JD 截图及其他附件">
+          <div class="material-block">
+            <el-button size="small" @click="attFileInput?.click()">+ 添加附件（可多选）</el-button>
+            <input
+              ref="attFileInput"
+              type="file"
+              multiple
+              style="display: none"
+              @change="onAttFilesChosen"
+            />
+            <div v-if="pendingFiles.length" class="pending-list">
+              <div v-for="(p, idx) in pendingFiles" :key="idx" class="pending-row">
+                <span class="pending-name" :title="p.file.name">{{ p.file.name }}</span>
+                <el-select v-model="p.attType" size="small" style="width: 110px">
+                  <el-option v-for="t in ATTACHMENT_TYPES" :key="t" :label="t" :value="t" />
+                </el-select>
+                <el-button text size="small" type="danger" @click="removePendingFile(idx)">
+                  移除
+                </el-button>
+              </div>
+            </div>
+            <div v-else class="material-hint">如岗位描述截图、招聘要求截图等，保存投递时自动上传</div>
+          </div>
+        </el-form-item>
+      </template>
     </el-form>
 
     <template #footer>
@@ -379,5 +535,36 @@ function onClose() {
   display: flex;
   justify-content: flex-end;
   gap: var(--sp-2);
+}
+
+.material-block {
+  width: 100%;
+}
+
+.material-hint {
+  font-size: var(--fs-xs);
+  color: var(--color-gray-500);
+  margin-top: var(--sp-1);
+}
+
+.pending-list {
+  margin-top: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.pending-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pending-name {
+  flex: 1;
+  font-size: var(--fs-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

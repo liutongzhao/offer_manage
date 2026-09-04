@@ -38,6 +38,17 @@ def get_or_404(db: Session, id: int):
     return obj
 
 
+def update_resume(db: Session, id: int, fields: dict):
+    """部分更新简历（如关联到投递）。fields 仅含显式传入的键。"""
+    obj = get_or_404(db, id)
+    if "application_id" in fields and fields["application_id"] is not None:
+        from app.repositories import application_repo
+
+        if not application_repo.get(db, fields["application_id"]):
+            raise HTTPException(status_code=404, detail="投递记录不存在")
+    return resume_repo.update(db, obj, fields)
+
+
 def delete_resume(db: Session, id: int) -> None:
     obj = get_or_404(db, id)
     try:
