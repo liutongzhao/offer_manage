@@ -6,8 +6,9 @@
 set -e
 cd "$(dirname "$0")"
 
-# 读 compose 用的凭据（backend.env 里有 MINIO_ROOT_USER/PASSWORD）
-[ -f backend.env ] && source backend.env
+# 读 compose 用的凭据（优先同目录 backend.env，服务器实际在 /opt/offer/backend.env）
+[ -f backend.env ] && source backend.env || true
+[ -f /opt/offer/backend.env ] && source /opt/offer/backend.env || true
 
 BACKUP_DIR="${1:-./backups}"
 STAMP=$(date +%Y%m%d-%H%M%S)
