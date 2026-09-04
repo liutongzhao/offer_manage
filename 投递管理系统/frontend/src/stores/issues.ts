@@ -7,10 +7,10 @@ export const useIssuesStore = defineStore('issues', () => {
   const items = ref<Issue[]>([])
   const loading = ref(false)
 
-  async function fetchAll() {
+  async function fetchAll(params: { category?: string; related_application_id?: number } = {}) {
     loading.value = true
     try {
-      items.value = await getIssues()
+      items.value = await getIssues(params)
     } finally {
       loading.value = false
     }

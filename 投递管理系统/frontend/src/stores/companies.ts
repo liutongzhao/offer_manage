@@ -1,16 +1,17 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Company } from '@/types'
+import type { CompanyWithCount } from '@/types'
 import { getCompanies } from '@/api/companies'
 
 export const useCompaniesStore = defineStore('companies', () => {
-  const items = ref<Company[]>([])
+  const items = ref<CompanyWithCount[]>([])
   const loading = ref(false)
 
-  async function fetchAll() {
+  async function fetchAll(keyword?: string) {
     loading.value = true
     try {
-      items.value = await getCompanies()
+      const list = await getCompanies({ keyword, with_count: true })
+      items.value = list as CompanyWithCount[]
     } finally {
       loading.value = false
     }
