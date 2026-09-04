@@ -83,11 +83,12 @@ def get_funnel(db: Session) -> dict:
         .all()
     )
     by_status = {s: c for s, c in rows}
+    total_all = sum(by_status.values())
+    pending = by_status.get("待投递", 0)
 
     ladder = [
-        ("投递", by_status.get("已投递", 0) + by_status.get("笔试中", 0)
-         + by_status.get("面试中", 0) + by_status.get("已Offer", 0)
-         + sum(by_status.get(t, 0) for t in TERMINAL_STATUSES)),
+        # 投递环节 = 全部记录 - 仍待投递（含已流出终态：已Offer/已挂/已拒绝/爽约），每条记录只计一次
+        ("投递", total_all - pending),
         ("笔试", by_status.get("笔试中", 0) + by_status.get("面试中", 0)
          + by_status.get("已Offer", 0)),
         ("面试", by_status.get("面试中", 0) + by_status.get("已Offer", 0)),
