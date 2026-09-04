@@ -7,6 +7,6 @@ export const getApplication = (id: number) =>
 export const createApplication = (data: ApplicationCreate) =>
   unwrap<Application>(client.post('/applications', data))
 export const updateApplication = (id: number, data: ApplicationUpdate) =>
-  unwrap<Application>(client.put(`/applications/${id}`, data))
+  unwrap<Application>(client.patch(`/applications/${id}`, data))
 export const deleteApplication = (id: number) =>
   unwrap<unknown>(client.delete(`/applications/${id}`))

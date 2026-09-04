@@ -5,31 +5,28 @@ export interface ApiResponse<T> {
   data: T
 }
 
-/** 公司 */
+/** 公司（对齐 backend/app/schemas/company.py） */
 export interface Company {
   id: number
   name: string
+  alias: string | null
   city: string | null
-  website: string | null
   industry: string | null
-  size: string | null
-  note: string | null
+  website: string | null
   created_at: string | null
-  updated_at: string | null
 }
 
 export interface CompanyCreate {
   name: string
+  alias?: string | null
   city?: string | null
-  website?: string | null
   industry?: string | null
-  size?: string | null
-  note?: string | null
+  website?: string | null
 }
 
-export type CompanyUpdate = Partial<CompanyCreate>
+export type CompanyUpdate = Partial<Omit<CompanyCreate, 'name'>>
 
-/** 投递记录 */
+/** 投递记录（对齐 backend/app/schemas/application.py） */
 export interface Application {
   id: number
   company_id: number
@@ -71,46 +68,46 @@ export interface ApplicationCreate {
 
 export type ApplicationUpdate = Partial<ApplicationCreate>
 
-/** 简历文件 */
+/** 简历资产（对齐 backend/app/schemas/resume.py） */
 export interface Resume {
   id: number
-  company_id: number | null
+  company: string | null
   application_id: number | null
-  file_name: string
-  original_name: string
+  filename: string
   object_key: string
-  file_url: string | null
-  file_size: number | null
+  size: number | null
   content_type: string | null
+  is_base: boolean
   version: string | null
-  note: string | null
   uploaded_at: string | null
 }
 
-/** 问题记录 */
+/** 问题记录（对齐 backend/app/schemas/issue.py） */
 export interface Issue {
   id: number
-  application_id: number | null
   title: string
   category: string
-  content: string | null
-  status: string
-  resolved_at: string | null
+  related_application_id: number | null
+  description: string | null
+  solution: string | null
+  tags: string | null
+  recorded_date: string | null
   created_at: string | null
-  updated_at: string | null
 }
 
 export interface IssueCreate {
-  application_id?: number | null
   title: string
-  category: string
-  content?: string | null
-  status?: string
+  category?: string
+  related_application_id?: number | null
+  description?: string | null
+  solution?: string | null
+  tags?: string | null
+  recorded_date?: string | null
 }
 
-export type IssueUpdate = Partial<IssueCreate> & { resolved_at?: string | null }
+export type IssueUpdate = Partial<IssueCreate>
 
-/** 看板统计 */
+/** 看板统计（对齐 backend/app/api/analytics.py summary） */
 export interface AnalyticsSummary {
   total: number
   by_type: Record<string, number>

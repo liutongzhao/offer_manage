@@ -1,4 +1,5 @@
 """MinIO 客户端封装：上传 / 预签名 URL / 下载 / 删除。"""
+from datetime import timedelta
 from io import BytesIO
 
 from minio import Minio
@@ -35,8 +36,16 @@ def upload_file(object_key: str, data: bytes, content_type: str | None = None) -
 
 
 def get_presigned_url(object_key: str, expires: int = 3600) -> str:
+    """返回预签名访问地址。
+
+    注意：minio SDK 7.x 的 expires 参数要求是 timedelta，不是秒数（int）。
+    """
     client = get_client()
-    return client.presigned_get_object(settings.minio_bucket, object_key, expires=expires)
+    return client.presigned_get_object(
+        settings.minio_bucket,
+        object_key,
+        expires=timedelta(seconds=expires),
+    )
 
 
 def download_file(object_key: str) -> bytes:

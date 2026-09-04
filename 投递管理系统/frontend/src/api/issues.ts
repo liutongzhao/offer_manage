@@ -7,6 +7,6 @@ export const getIssue = (id: number) =>
 export const createIssue = (data: IssueCreate) =>
   unwrap<Issue>(client.post('/issues', data))
 export const updateIssue = (id: number, data: IssueUpdate) =>
-  unwrap<Issue>(client.put(`/issues/${id}`, data))
+  unwrap<Issue>(client.patch(`/issues/${id}`, data))
 export const deleteIssue = (id: number) =>
   unwrap<unknown>(client.delete(`/issues/${id}`))

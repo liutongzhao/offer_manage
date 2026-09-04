@@ -21,9 +21,21 @@ onMounted(() => {
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="title" label="标题" min-width="200" />
       <el-table-column prop="category" label="分类" width="120" />
-      <el-table-column prop="status" label="状态" width="110" />
-      <el-table-column prop="application_id" label="关联投递" width="110" />
-      <el-table-column prop="content" label="内容" min-width="220" show-overflow-tooltip />
+      <el-table-column prop="related_application_id" label="关联投递" width="110" />
+      <el-table-column
+        prop="description"
+        label="描述"
+        min-width="200"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="solution"
+        label="解决办法"
+        min-width="180"
+        show-overflow-tooltip
+      />
+      <el-table-column prop="tags" label="标签" width="140" />
+      <el-table-column prop="recorded_date" label="记录日期" width="120" />
     </el-table>
   </el-card>
 </template>

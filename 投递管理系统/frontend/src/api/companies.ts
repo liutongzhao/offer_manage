@@ -7,6 +7,6 @@ export const getCompany = (id: number) =>
 export const createCompany = (data: CompanyCreate) =>
   unwrap<Company>(client.post('/companies', data))
 export const updateCompany = (id: number, data: CompanyUpdate) =>
-  unwrap<Company>(client.put(`/companies/${id}`, data))
+  unwrap<Company>(client.patch(`/companies/${id}`, data))
 export const deleteCompany = (id: number) =>
   unwrap<unknown>(client.delete(`/companies/${id}`))

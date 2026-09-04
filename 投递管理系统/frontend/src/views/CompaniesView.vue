@@ -20,9 +20,10 @@ onMounted(() => {
     <el-table :data="store.items" v-loading="store.loading" stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="name" label="公司名称" min-width="160" />
+      <el-table-column prop="alias" label="别名" width="140" />
       <el-table-column prop="city" label="城市" width="110" />
       <el-table-column prop="industry" label="行业" width="140" />
-      <el-table-column prop="note" label="备注" min-width="160" show-overflow-tooltip />
+      <el-table-column prop="website" label="官网" min-width="180" show-overflow-tooltip />
     </el-table>
   </el-card>
 </template>
