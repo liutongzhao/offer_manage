@@ -1,1 +1,22 @@
+# 记忆目录（含个人隐私，禁止入库）
 .workbuddy/
+
+# 后端 Python
+投递管理系统/backend/.venv/
+投递管理系统/backend/.env
+投递管理系统/backend/app/data/
+投递管理系统/backend/data/
+投递管理系统/backend/__pycache__/
+投递管理系统/backend/**/__pycache__/
+
+# 前端 Node
+投递管理系统/frontend/node_modules/
+投递管理系统/frontend/dist/
+投递管理系统/frontend/.npm-cache/
+投递管理系统/frontend/.npm-tmp/
+
+# MinIO 本地数据卷
+投递管理系统/minio-data/
+
+# 系统
+.DS_Store
