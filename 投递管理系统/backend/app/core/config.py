@@ -9,6 +9,9 @@ class Settings(BaseSettings):
 
     # MinIO
     minio_endpoint: str = "localhost:9000"
+    # 预签名 URL 用的对外端点（浏览器可直达）。为空则与 minio_endpoint 相同。
+    # 服务器部署时设为 "公网IP:9000"，容器内部读写仍走 minio_endpoint。
+    minio_external_endpoint: str = ""
     minio_root_user: str = "offer_admin"
     minio_root_password: str = "offer_password_123"
     minio_bucket: str = "qiuzhao"

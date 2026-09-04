@@ -26,6 +26,24 @@ def get_client() -> Minio:
     return _client
 
 
+def get_presign_client() -> Minio:
+    """生成预签名 URL 用的客户端。
+
+    服务器部署时 minio_endpoint 指向容器内网地址（如 minio:9000），
+    浏览器拿到的 URL 必须是可达的外网地址，故预签名单独用外部端点。
+    未配置外部端点时与内部端点一致（本地开发场景，行为不变）。
+    """
+    external = settings.minio_external_endpoint or settings.minio_endpoint
+    if external == settings.minio_endpoint:
+        return get_client()
+    return Minio(
+        external,
+        access_key=settings.minio_root_user,
+        secret_key=settings.minio_root_password,
+        secure=settings.minio_use_ssl,
+    )
+
+
 def upload_file(object_key: str, data: bytes, content_type: str | None = None) -> None:
     client = get_client()
     client.put_object(
@@ -42,7 +60,7 @@ def get_presigned_url(object_key: str, expires: int = 3600) -> str:
 
     注意：minio SDK 7.x 的 expires 参数要求是 timedelta，不是秒数（int）。
     """
-    client = get_client()
+    client = get_presign_client()
     return client.presigned_get_object(
         settings.minio_bucket,
         object_key,

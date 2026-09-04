@@ -20,3 +20,10 @@
 
 # 系统
 .DS_Store
+
+# 服务器部署：敏感配置与运行数据不入库
+投递管理系统/deploy/backend.env
+投递管理系统/deploy/htpasswd
+投递管理系统/deploy/minio-data/
+投递管理系统/deploy/app-data/
+投递管理系统/deploy/backups/
