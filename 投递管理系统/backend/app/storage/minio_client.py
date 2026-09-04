@@ -8,6 +8,8 @@ from app.core.config import settings
 
 _client: Minio | None = None
 
+BUCKET_NAME = settings.minio_bucket
+
 
 def get_client() -> Minio:
     """返回单例客户端，并确保桶存在。"""
@@ -61,3 +63,9 @@ def download_file(object_key: str) -> bytes:
 def delete_file(object_key: str) -> None:
     client = get_client()
     client.remove_object(settings.minio_bucket, object_key)
+
+
+def list_objects(prefix: str = "") -> list:
+    """列出指定前缀下的对象（备份列表用）。"""
+    client = get_client()
+    return list(client.list_objects(settings.minio_bucket, prefix=prefix, recursive=True))

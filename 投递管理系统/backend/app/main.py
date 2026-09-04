@@ -4,7 +4,18 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import analytics, applications, companies, issues, resumes
+from app.api import (
+    analytics,
+    applications,
+    attachments,
+    companies,
+    communications,
+    data,
+    issues,
+    links,
+    resumes,
+    tags,
+)
 from app.core.config import settings
 from app.core.db import init_db
 from app.core.logging import logger
@@ -19,7 +30,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="秋招投递管理平台", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="秋招投递管理平台", version="0.2.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,9 +43,14 @@ app.add_middleware(
 for r in (
     companies.router,
     applications.router,
+    communications.router,
+    links.router,
+    attachments.router,
     resumes.router,
     issues.router,
+    tags.router,
     analytics.router,
+    data.router,
 ):
     app.include_router(r)
 

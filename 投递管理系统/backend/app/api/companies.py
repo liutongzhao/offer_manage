@@ -1,5 +1,5 @@
-"""公司路由层。"""
-from fastapi import APIRouter, Depends
+"""公司路由层（含投递数聚合）。"""
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_db
@@ -15,8 +15,25 @@ def create(data: CompanyCreate, db: Session = Depends(get_db)):
     return ApiResponse(data=CompanyOut.model_validate(company_service.create_company(db, data)))
 
 
-@router.get("", response_model=ApiResponse[list[CompanyOut]])
-def list_all(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@router.get("", response_model=ApiResponse[list])
+def list_all(
+    with_count: bool = Query(True, description="是否附带投递数聚合"),
+    keyword: str | None = Query(None, description="公司名/别名模糊搜索"),
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
+    if with_count:
+        items = company_service.list_with_count(db, skip, limit)
+        if keyword:
+            kw = keyword.strip().lower()
+            items = [
+                i
+                for i in items
+                if kw in (i["name"] or "").lower()
+                or kw in (i.get("alias") or "").lower()
+            ]
+        return ApiResponse(data=items)
     items = company_service.list_companies(db, skip, limit)
     return ApiResponse(data=[CompanyOut.model_validate(i) for i in items])
 
