@@ -18,6 +18,8 @@ engine = create_engine(
     f"sqlite:///{_db_path}",
     connect_args={"check_same_thread": False},
 )
+# 数据库文件绝对路径（备份/恢复使用）
+DB_PATH = _db_path
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 

@@ -1,7 +1,7 @@
 """公司实体。"""
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -15,7 +15,10 @@ class Company(Base):
     alias: Mapped[str | None] = mapped_column(String(120), nullable=True)
     city: Mapped[str | None] = mapped_column(String(60), nullable=True)
     industry: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    # 公司规模：大厂/中厂/初创/其他
+    scale: Mapped[str | None] = mapped_column(String(20), nullable=True)
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     applications = relationship("Application", back_populates="company")

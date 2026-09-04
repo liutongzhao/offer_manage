@@ -19,7 +19,11 @@ class ApplicationCreate(BaseModel):
     referrer: str | None = None
     salary: str | None = None
     deadline: date | None = None
+    interview_stage: str | None = None
+    result_date: date | None = None
     notes: str | None = None
+    # 创建时可同时打标签（自由输入，自动建档）
+    tag_names: list[str] | None = None
 
 
 class ApplicationUpdate(BaseModel):
@@ -36,7 +40,10 @@ class ApplicationUpdate(BaseModel):
     referrer: str | None = None
     salary: str | None = None
     deadline: date | None = None
+    interview_stage: str | None = None
+    result_date: date | None = None
     notes: str | None = None
+    archived: bool | None = None
 
 
 class ApplicationOut(BaseModel):
@@ -44,6 +51,7 @@ class ApplicationOut(BaseModel):
 
     id: int
     company_id: int
+    company_name: str | None = None
     type: str
     position: str
     status: str
@@ -57,6 +65,17 @@ class ApplicationOut(BaseModel):
     referrer: str | None = None
     salary: str | None = None
     deadline: date | None = None
+    interview_stage: str | None = None
+    result_date: date | None = None
     notes: str | None = None
+    archived: bool = False
+    tag_names: list[str] = []
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+
+class ApplicationListData(BaseModel):
+    """列表分页数据。"""
+
+    total: int
+    items: list[ApplicationOut]
